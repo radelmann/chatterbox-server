@@ -11,7 +11,10 @@ this file and include it in basic-server.js so that it actually works.
 *Hint* Check out the node module documentation at http://nodejs.org/api/modules.html.
 
 **************************************************************/
-var path = require('path');
+var url = require('url');
+var fs = require('fs');
+
+var data = [];
 
 var requestHandler = function(request, response) {
   // Request and Response come from node's http module.
@@ -40,21 +43,54 @@ var requestHandler = function(request, response) {
   //
   // You will need to change this if you are sending something
   // other than plain text, like JSON or HTML.
-  headers['Content-Type'] = "application/json";
+  var urlObj = url.parse(request.url, true);
 
-  // .writeHead() writes to the request line and headers of the response,
-  // which includes the status and all headers.
-  response.writeHead(statusCode, headers);
+
+  if (urlObj.pathname === '/classes/room1') {
+    if (request.method === 'GET') {
+      headers['Content-Type'] = "application/json";
+
+      // .writeHead() writes to the request line and headers of the response,
+      // which includes the status and all headers.
+      response.writeHead(statusCode, headers);
+
+      var returnObj = {
+        results: data
+      };
+
+      response.end(JSON.stringify(returnObj));
+      return;
+    } 
+
+    if (request.method === 'POST') {
+      
+      statusCode = 201;
+      
+      data.push(request._postData);
+
+      response.writeHead(statusCode, headers);
+      response.end();
+    }    
+
+  } else {
+    headers['Content-Type'] = "text/plain";
+
+    // .writeHead() writes to the request line and headers of the response,
+    // which includes the status and all headers.
+    response.writeHead(statusCode, headers);
+    response.end("Hello, World!");
+    return;
+  }
 
   // Make sure to always call response.end() - Node may not send
   // anything back to the client until you do. The string you pass to
   // response.end() will be the body of the response - i.e. what shows
   // up in the browser.
-  //
-  return {};
+
+
   // Calling .end "flushes" the response's internal buffer, forcing
   // node to actually send all the data over to the client.
-  response.end("Hello, World!");
+
 };
 
 // These headers will allow Cross-Origin Resource Sharing (CORS).
@@ -74,3 +110,7 @@ var defaultCorsHeaders = {
 };
 
 module.exports.requestHandler = requestHandler;
+
+
+
+
