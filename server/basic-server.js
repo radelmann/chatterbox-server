@@ -1,7 +1,7 @@
   /* Import node's http module: */
 var express = require('express');
 var app = express();
-var handleRequest = require('./request-handler.js').requestHandler;
+var handleRequest = require('./request-handler.js');
 
 //var http = require("http");
 
@@ -16,8 +16,6 @@ app.post('/messages', handleRequest);
 var port = 3000;
 
 var ip = "127.0.0.1";
-
-//var server = http.createServer(handleRequest);
 
 console.log("Listening on http://" + ip + ":" + port);
 app.listen(port, ip);
