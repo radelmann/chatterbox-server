@@ -6,7 +6,6 @@ app.init = function () {
   app.fetch();
 }
 
-
 app.addMessage = function (item){
   var message = item.text ? escapeHtml(item.text) : "";
   var name = item.username ? escapeHtml(item.username) : "";
@@ -17,7 +16,6 @@ app.addMessage = function (item){
   + name  + '</p> <p class="messageContent">' 
   + message + '</p> </div>');
 }
-
 
 app.server = 'http://127.0.0.1:3000/messages';
 
@@ -34,9 +32,7 @@ app.send = function (message) {
     },
     error: function (data) {
       console.log('chatterbox: Failed to send message');
-      app.fetch();
       throw data;
-
     }
 
   });

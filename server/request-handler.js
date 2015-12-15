@@ -1,8 +1,6 @@
 var url = require('url');
 var fs = require('fs');
 
-var data = [];
-
 module.exports = function(request, response) {
   // The outgoing status.
   var statusCode = 200;
@@ -16,17 +14,18 @@ module.exports = function(request, response) {
 
     // .writeHead() writes to the request line and headers of the response,
     // which includes the status and all headers.
-    response.writeHead(statusCode, headers);
+    fs.readFile('dataFile.json', function(err, data) {
+      if (err) throw err;
 
-    var returnObj = {
-      results: data
-    };
+      response.writeHead(statusCode, headers);
+      response.end(data.toString());
 
-    response.end(JSON.stringify(returnObj));
-    return;
+      return;
+    });
   }
 
   if (request.method === 'POST') {
+    var messageData;
     var reqData = '';
 
     request.on('data', function(data) {
@@ -35,23 +34,6 @@ module.exports = function(request, response) {
 
     request.on('end', function() {
       var _data = JSON.parse(reqData);
-      data.push(_data);
-
-      console.log(_data);
-
-      //read file
-      fs.readFile('dataFile.json', function (err, data) {
-        if (err) throw err;
-        
-        JSON.parse
-
-      });
-      //parse to js object
-
-      //push _data to js object
-      //stringify js object
-      //write back to file
-
 
       response.writeHead(statusCode, headers);
       var responseObj = {
@@ -59,15 +41,27 @@ module.exports = function(request, response) {
         success: 'updated successfully'
       }
 
-
       response.end(JSON.stringify(responseObj));
+
+      //get data file and load into memory
+      //read file
+      fs.readFile('dataFile.json', function(err, data) {
+        if (err) throw err;
+        messageData = JSON.parse(data.toString());
+        messageData.results.push(_data);
+
+        var strMessageData = JSON.stringify(messageData);
+
+        fs.writeFile('dataFile.json', strMessageData, function(err) {
+          if (err) throw err;
+          //success
+        });
+      });
+
     });
-
-
   }
 
   if (request.method === 'OPTIONS') {
-
     statusCode = 200;
     headers['Content-Type'] = "text/plain";
     response.writeHead(statusCode, headers);
