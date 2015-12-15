@@ -39,14 +39,31 @@ module.exports = function(request, response) {
 
       console.log(_data);
 
+      //read file
+      fs.readFile('dataFile.json', function (err, data) {
+        if (err) throw err;
+        
+        JSON.parse
+
+      });
+      //parse to js object
+
+      //push _data to js object
+      //stringify js object
+      //write back to file
+
 
       response.writeHead(statusCode, headers);
       var responseObj = {
         statusCode: 201,
         success: 'updated successfully'
       }
+
+
       response.end(JSON.stringify(responseObj));
     });
+
+
   }
 
   if (request.method === 'OPTIONS') {
