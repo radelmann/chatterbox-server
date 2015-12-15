@@ -1,0 +1,26 @@
+#chats {
+  width: 600px;
+}
+.chatMessage {
+  display: block;
+  margin: 0 auto;
+  width: 80%;
+  /*border: 1px solid grey;*/
+}
+.userName {
+  font-size: 1.3em;
+
+}
+.messageContent {
+  font-size: 0.9em;
+}
+
+button {
+  display: block;
+  margin-top: 10px;
+}
+
+input[type=text]{
+  width: 200px;
+}
+
