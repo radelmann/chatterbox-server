@@ -1,5 +1,9 @@
 var url = require('url');
 var fs = require('fs');
+var redis = require('redis');
+var client = redis.createClient();
+
+var key = 'data';
 
 module.exports = function(request, response) {
   // The outgoing status.
@@ -12,16 +16,28 @@ module.exports = function(request, response) {
 
   if (request.method === 'GET') {
 
-    // .writeHead() writes to the request line and headers of the response,
-    // which includes the status and all headers.
-    fs.readFile('dataFile.json', 'utf8', function(err, data) {
-      if (err) throw err;
+    // fs.readFile('dataFile.json', 'utf8', function(err, data) {
+    //   if (err) throw err;
+
+    //   response.writeHead(statusCode, headers);
+    //   response.end(data);
+
+    //   return;
+    // });
+
+    client.get(key, function(err, reply) {
+
+      var data = JSON.parse(reply);
+
+      var responseObj = {
+        results: data
+      };
+      
+      headers['Content-Type'] = "application/json";
 
       response.writeHead(statusCode, headers);
-      response.end(data);
-
-      return;
-    });
+      response.end(JSON.stringify(responseObj));
+    })
   }
 
   if (request.method === 'POST') {
@@ -47,18 +63,30 @@ module.exports = function(request, response) {
 
       var _data = JSON.parse(reqData);
 
-      fs.readFile('dataFile.json', 'utf8', function(err, data) {
-        if (err) throw err;
-        messageData = JSON.parse(data);
-        messageData.results.push(_data);
+      // fs.readFile('dataFile.json', 'utf8', function(err, data) {
+      //   if (err) throw err;
+      //   messageData = JSON.parse(data);
+      //   messageData.results.push(_data);
 
-        var strMessageData = JSON.stringify(messageData);
+      //   var strMessageData = JSON.stringify(messageData);
 
-        fs.writeFile('dataFile.json', strMessageData, function(err) {
-          if (err) throw err;
-          //success
-        });
-      });
+      //   fs.writeFile('dataFile.json', strMessageData, function(err) {
+      //     if (err) throw err;
+      //     //success
+      //   });
+      // });
+
+      client.get(key, function(err, reply) {
+        var data;
+        if (!reply) {
+          data = [];
+        } else {
+          data = JSON.parse(reply);
+        }
+        data.push(JSON.parse(reqData));
+        console.log(data);
+        client.set(key, JSON.stringify(data));
+      })
     });
   }
 
