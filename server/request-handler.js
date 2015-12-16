@@ -14,11 +14,11 @@ module.exports = function(request, response) {
 
     // .writeHead() writes to the request line and headers of the response,
     // which includes the status and all headers.
-    fs.readFile('dataFile.json', function(err, data) {
+    fs.readFile('dataFile.json', 'utf8', function(err, data) {
       if (err) throw err;
 
       response.writeHead(statusCode, headers);
-      response.end(data.toString());
+      response.end(data);
 
       return;
     });
@@ -33,9 +33,8 @@ module.exports = function(request, response) {
     });
 
     request.on('end', function() {
-      var _data = JSON.parse(reqData);
-
       response.writeHead(statusCode, headers);
+
       var responseObj = {
         statusCode: 201,
         success: 'updated successfully'
@@ -45,9 +44,12 @@ module.exports = function(request, response) {
 
       //get data file and load into memory
       //read file
-      fs.readFile('dataFile.json', function(err, data) {
+
+      var _data = JSON.parse(reqData);
+
+      fs.readFile('dataFile.json', 'utf8', function(err, data) {
         if (err) throw err;
-        messageData = JSON.parse(data.toString());
+        messageData = JSON.parse(data);
         messageData.results.push(_data);
 
         var strMessageData = JSON.stringify(messageData);
@@ -57,7 +59,6 @@ module.exports = function(request, response) {
           //success
         });
       });
-
     });
   }
 
